@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Bocadillo de chat con un botón de play dentro -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,30C40.7,30 30,39.8 30,52c0,6.1 2.7,11.6 7,15.6L35,78l11.3,-5.4c2.4,0.6 5,0.9 7.7,0.9 13.3,0 24,-9.8 24,-21.5S67.3,30 54,30z" />
+    <path
+        android:fillColor="#25D366"
+        android:pathData="M48,42L63,51.5 48,61z" />
+</vector>
