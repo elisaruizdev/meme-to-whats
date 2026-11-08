@@ -15,8 +15,12 @@ android {
         applicationId = "com.memetowhats.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 10
+        versionName = "0.9.0"
+
+        // Solo procesadores ARM (todos los móviles actuales): Vosk trae su motor nativo para
+        // cada tipo y con todos la APK pasaba de 50 MB. Para el emulador x86 habría que añadir "x86_64".
+        ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a") }
     }
 
     buildTypes {
@@ -31,6 +35,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -59,5 +64,10 @@ dependencies {
     implementation(libs.coil.gif)
     implementation(libs.media3.exoplayer)
     implementation(libs.media3.ui)
+    // Voz a texto en el móvil para los subtítulos de los GIF. JNA tiene que ir como AAR
+    // (trae las librerías nativas de Android), no como el JAR que Vosk pide por defecto.
+    implementation(libs.vosk.android) { exclude(group = "net.java.dev.jna") }
+    implementation(libs.jna) { artifact { type = "aar" } }
     debugImplementation(libs.androidx.compose.ui.tooling)
+    testImplementation(libs.junit)
 }

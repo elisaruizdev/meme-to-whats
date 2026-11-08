@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
 
-enum class TypeFilter { ALL, IMAGES, VIDEOS }
+enum class TypeFilter { ALL, STICKERS, GIFS, IMAGES, VIDEOS }
 
 data class LibraryEntry(
     val item: LibraryItem,
@@ -89,7 +89,9 @@ class LibraryViewModel(private val repository: LibraryRepository) : ViewModel() 
         if (categoryId != null && item.categoryId != categoryId) return false
         when (type) {
             TypeFilter.ALL -> Unit
-            TypeFilter.IMAGES -> if (item.type == MediaType.VIDEO) return false
+            TypeFilter.STICKERS -> if (item.type != MediaType.STICKER) return false
+            TypeFilter.GIFS -> if (item.type != MediaType.GIF) return false
+            TypeFilter.IMAGES -> if (item.type != MediaType.IMAGE) return false
             TypeFilter.VIDEOS -> if (item.type != MediaType.VIDEO) return false
         }
         return matchesQuery(query, item.title, item.audioText, item.tags, categoryName)

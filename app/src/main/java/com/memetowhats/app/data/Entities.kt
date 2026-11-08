@@ -5,7 +5,8 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-enum class MediaType { IMAGE, GIF, VIDEO }
+/** STICKER y los GIF creados en la app se guardan aquí igual que lo importado. */
+enum class MediaType { IMAGE, GIF, VIDEO, STICKER }
 
 @Entity(tableName = "categories", indices = [Index(value = ["name"], unique = true)])
 data class Category(

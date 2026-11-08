@@ -5,6 +5,7 @@ import android.net.Uri
 import android.provider.OpenableColumns
 import android.util.Log
 import android.webkit.MimeTypeMap
+import com.memetowhats.app.stickers.StickerStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -84,6 +85,24 @@ class LibraryRepository(
             ?.ifBlank { null }
             ?: "Sin título"
 
+    /**
+     * Guarda en la biblioteca un sticker o GIF recién creado (mueve [file] a la carpeta de la
+     * biblioteca). Devuelve el elemento con su archivo definitivo.
+     */
+    suspend fun addCreation(file: File, mimeType: String, type: MediaType, title: String): Pair<LibraryItem, File> =
+        withContext(Dispatchers.IO) {
+            val target = File(mediaDir, "${UUID.randomUUID()}.${file.extension}")
+            file.copyTo(target)
+            file.delete()
+            val item = LibraryItem(fileName = target.name, mimeType = mimeType, type = type, title = title)
+            try {
+                item.copy(id = itemDao.insert(item)) to target
+            } catch (e: Exception) {
+                target.delete()
+                throw e
+            }
+        }
+
     suspend fun updateDetails(id: Long, title: String, audioText: String, tags: String, categoryId: Long?) =
         itemDao.updateDetails(
             id = id,
@@ -98,6 +117,8 @@ class LibraryRepository(
     suspend fun delete(item: LibraryItem) = withContext(Dispatchers.IO) {
         itemDao.delete(item)
         fileFor(item).delete()
+        // Si era un sticker, sale también del pack de WhatsApp.
+        if (item.type == MediaType.STICKER) StickerStore.removeByKey(context, item.fileName.substringBeforeLast('.'))
     }
 
     /** Crea la categoría si no existe (sin distinguir mayúsculas) y devuelve su id. */
