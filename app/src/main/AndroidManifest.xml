@@ -1,6 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Solo para descargar (una vez) el modelo de voz a texto de los subtítulos. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Leer las capturas y grabaciones de pantalla de la galería. -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <!-- Guardar en la galería en Android 8 y 9 (desde Android 10 no hace falta). -->
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+
+    <!-- Android 14+: saber que se ha hecho una captura (tutorial). No pide nada al usuario. -->
+    <uses-permission android:name="android.permission.DETECT_SCREEN_CAPTURE" />
+
+    <!-- WhatsApp (packs de stickers) y apps de mensajería a las que enviar. -->
+    <queries>
+        <package android:name="com.whatsapp" />
+        <package android:name="com.whatsapp.w4b" />
+        <!-- Ver qué apps de mensajería instaladas aceptan imágenes, para la fila «Enviar a». -->
+        <intent>
+            <action android:name="android.intent.action.SEND" />
+            <data android:mimeType="image/*" />
+        </intent>
+    </queries>
+
     <application
         android:name=".MemeApp"
         android:allowBackup="true"
@@ -38,6 +67,14 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+        <!-- WhatsApp lee de aquí los packs de stickers. Solo WhatsApp tiene este permiso. -->
+        <provider
+            android:name=".stickers.StickerContentProvider"
+            android:authorities="${applicationId}.stickercontentprovider"
+            android:enabled="true"
+            android:exported="true"
+            android:readPermission="com.whatsapp.sticker.READ" />
     </application>
 
 </manifest>

@@ -94,7 +94,7 @@ fun LibraryScreen(
     }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Meme to Whats") }) },
+        topBar = { TopAppBar(title = { Text("Mi biblioteca") }) },
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = {
@@ -141,14 +141,14 @@ fun LibraryScreen(
             when {
                 state.loading -> Unit
                 state.totalCount == 0 -> EmptyMessage(
-                    "Tu biblioteca está vacía.\n\nPulsa «Añadir» para elegir memes y vídeos, " +
-                        "o compártelos con Meme to Whats desde WhatsApp o la galería.",
+                    "Tu biblioteca está vacía.\n\nLos stickers y GIF que crees aparecerán aquí. " +
+                        "También puedes pulsar «Añadir» para guardar memes y vídeos.",
                 )
                 state.entries.isEmpty() -> EmptyMessage("No hay nada que coincida con la búsqueda.")
                 else -> MediaGrid(
                     entries = state.entries,
                     onOpen = { onOpenItem(it.item.id) },
-                    onQuickShare = { Sharing.toWhatsApp(context, it.file, it.item.mimeType) },
+                    onQuickShare = { Sharing.withChooser(context, it.file, it.item.mimeType) },
                 )
             }
         }
@@ -182,6 +182,20 @@ private fun FilterRow(
                 onClick = onToggleFavorites,
                 label = { Text("Favoritos") },
                 leadingIcon = { Icon(Icons.Default.Favorite, contentDescription = null, Modifier.size(18.dp)) },
+            )
+        }
+        item {
+            FilterChip(
+                selected = state.filters.type == TypeFilter.STICKERS,
+                onClick = { onType(TypeFilter.STICKERS) },
+                label = { Text("Stickers") },
+            )
+        }
+        item {
+            FilterChip(
+                selected = state.filters.type == TypeFilter.GIFS,
+                onClick = { onType(TypeFilter.GIFS) },
+                label = { Text("GIF") },
             )
         }
         item {
@@ -234,7 +248,7 @@ private fun MediaGrid(
                 Modifier.combinedClickable(
                     onClick = { onOpen(entry) },
                     onLongClick = {
-                        // Mantener pulsado = enviar directo a WhatsApp.
+                        // Mantener pulsado = abrir el menú de enviar.
                         haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                         onQuickShare(entry)
                     },

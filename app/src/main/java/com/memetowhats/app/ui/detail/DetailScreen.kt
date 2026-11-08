@@ -64,6 +64,10 @@ import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import coil3.compose.AsyncImage
+import com.memetowhats.app.ui.share.SendBar
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import com.memetowhats.app.data.Category
 import com.memetowhats.app.data.LibraryItem
 import com.memetowhats.app.data.MediaType
@@ -81,8 +85,10 @@ fun DetailScreen(
     val file = state.file
     val context = LocalContext.current
     var confirmDelete by remember { mutableStateOf(false) }
+    val snackbar = remember { SnackbarHostState() }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbar) },
         topBar = {
             TopAppBar(
                 title = { Text("Detalle") },
@@ -110,28 +116,15 @@ fun DetailScreen(
         bottomBar = {
             if (item != null && file != null) {
                 Surface(tonalElevation = 3.dp) {
-                    Row(
-                        Modifier
-                            .fillMaxWidth()
-                            .navigationBarsPadding()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    ) {
-                        Button(
-                            onClick = { Sharing.toWhatsApp(context, file, item.mimeType) },
-                            modifier = Modifier.weight(1f),
-                        ) {
-                            Icon(Icons.AutoMirrored.Filled.Send, contentDescription = null)
-                            Text("WhatsApp", Modifier.padding(start = 8.dp))
-                        }
-                        OutlinedButton(
-                            onClick = { Sharing.withChooser(context, file, item.mimeType) },
-                            modifier = Modifier.weight(1f),
-                        ) {
-                            Icon(Icons.Default.Share, contentDescription = null)
-                            Text("Otras apps", Modifier.padding(start = 8.dp))
-                        }
-                    }
+                    SendBar(
+                        file = file,
+                        mimeType = item.mimeType,
+                        key = item.fileName.substringBeforeLast('.'),
+                        isSticker = item.type == MediaType.STICKER,
+                        snackbar = snackbar,
+                        modifier = Modifier.fillMaxWidth().navigationBarsPadding().padding(vertical = 12.dp),
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+                    )
                 }
             }
         },
